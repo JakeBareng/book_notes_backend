@@ -28,7 +28,7 @@ public class Book {
   private User user;
 
   @OneToMany(mappedBy = "book")
-  private Set<Note> notes = new LinkedHashSet<>();
+  private Set<Note> notes;
 
   public Integer getId() {
     return id;

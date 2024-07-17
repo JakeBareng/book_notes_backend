@@ -8,11 +8,10 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User {
+
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id_gen")
-  @SequenceGenerator(name = "users_id_gen", sequenceName = "users_id_seq", allocationSize = 1)
   @Column(name = "id", nullable = false)
-  private Integer id;
+  private String id;
 
   @Column(name = "email", nullable = false, length = 120)
   private String email;
@@ -20,14 +19,11 @@ public class User {
   @Column(name = "name", nullable = false, length = 64)
   private String name;
 
-  @OneToMany(mappedBy = "user")
-  private Set<Book> books = new LinkedHashSet<>();
-
-  public Integer getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(String id) {
     this.id = id;
   }
 
@@ -45,14 +41,6 @@ public class User {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public Set<Book> getBooks() {
-    return books;
-  }
-
-  public void setBooks(Set<Book> books) {
-    this.books = books;
   }
 
 }
