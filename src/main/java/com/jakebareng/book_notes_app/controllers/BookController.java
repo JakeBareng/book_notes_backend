@@ -27,20 +27,20 @@ public class BookController {
   }
 
 
-  @GetMapping("/")
+  @GetMapping
   public List<Book> getAllBooks(@AuthenticationPrincipal OAuth2User oAuth2User) {
     // get user
     User user = userService.getUser(oAuth2User);
 
     // get user books
-      return bookRepository.findAllByUserId(user.getId());
+      return bookRepository.findAllByUser_Id(user.getId());
   }
 
   @GetMapping("/{book_id}")
   public Book getBookById(@AuthenticationPrincipal OAuth2User oAuth2User, @PathVariable Long book_id) {
     User user = userService.getUser(oAuth2User);
 
-    return bookRepository.findByUseridAndBookId(user.getId(),book_id);
+    return bookRepository.findByUser_IdAndId(user.getId(),book_id);
   }
 
   @PostMapping("/")
@@ -56,7 +56,7 @@ public class BookController {
   @PutMapping("/{book_id}")
   public Book EditBook(@PathVariable long book_id,@AuthenticationPrincipal OAuth2User oAuth2User, @RequestBody BookRequest bookRequest) {
     User user = userService.getUser(oAuth2User);
-    Book book = bookRepository.findByUseridAndBookId(user.getId(),book_id);
+    Book book = bookRepository.findByUser_IdAndId(user.getId(),book_id);
 
     if (book != null) {
       book.setTitle(bookRequest.title);
@@ -69,7 +69,7 @@ public class BookController {
   @DeleteMapping("/{book_id}")
   public void deleteBook(@PathVariable long book_id, @AuthenticationPrincipal OAuth2User oAuth2User) {
     User user = userService.getUser(oAuth2User);
-    Book book = bookRepository.findByUseridAndBookId(user.getId(),book_id);
+    Book book = bookRepository.findByUser_IdAndId(user.getId(),book_id);
     if (book != null) {
       bookRepository.delete(book);
     }

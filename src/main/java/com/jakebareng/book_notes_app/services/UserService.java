@@ -35,4 +35,8 @@ public class UserService {
 
     return userRepository.save(user);
   }
+
+  public String getPicture(OAuth2User oauth2User) {
+    return oauth2User.getAttribute("picture");
+  }
 }

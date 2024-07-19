@@ -1,5 +1,6 @@
 package com.jakebareng.book_notes_app.schemas;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -22,6 +23,7 @@ public class Note {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "book_id", nullable = false)
+  @JsonBackReference
   private Book book;
 
   public Integer getId() {

@@ -20,56 +20,43 @@ public class NoteController {
 
   private final BookRepository bookRepository;
   private final NoteRepository noteRepository;
-  private final UserRepository userRepository;
   private final UserService userService;
 
 
   public NoteController(BookRepository bookRepository, NoteRepository noteRepository, UserRepository userRepository, UserService userService) {
     this.bookRepository = bookRepository;
     this.noteRepository = noteRepository;
-    this.userRepository = userRepository;
     this.userService = userService;
   }
 
   /**
-   * get all notes
+   * get all notes that belong to user
    * @return List<Note>
    */
   @GetMapping
   public List<Note> getAllNotes(@AuthenticationPrincipal OAuth2User oAuth2User) {
     User user = userService.getUser(oAuth2User);
-    return noteRepository.findAllByUserId(user.getId());
+    return noteRepository.findByBook_User(user);
   }
 
-  @GetMapping("/{book_id}")
-  public List<Note> getNoteByBook(@AuthenticationPrincipal OAuth2User oAuth2User,@PathVariable Long book_id) {
+  @GetMapping("/note_id/{id}")
+  public Note getNoteByNoteId(@AuthenticationPrincipal OAuth2User oAuth2User,@PathVariable Integer id) {
     User user = userService.getUser(oAuth2User);
-    Book book = bookRepository.findById(book_id).orElse(null);
-    if (book == null) { return null;}
-    if (book.getUser().equals(user)) {
-      return noteRepository.findAllByBookId(book_id);
-    }
-    return null;
+    return noteRepository.findByBook_UserAndId(user,id);
   }
 
-  @GetMapping("/{book_id}/{note_id}")
-  public Note getNote (@AuthenticationPrincipal OAuth2User oAuth2User,@PathVariable Long book_id,@PathVariable Long note_id) {
-    User user = userService.getUser(oAuth2User);
-    Book book = bookRepository.findById(book_id).orElse(null);
-    Note note = noteRepository.findById(note_id).orElse(null);
-    if (book == null || note == null) { return null;}
 
-    if (book.getUser().equals(user) && note.getBook().equals(book)) {
-      return note;
-    }
-    return null;
+  @GetMapping("/book_id/{id}")
+  public List<Note> getNoteByBook(@AuthenticationPrincipal OAuth2User oAuth2User,@PathVariable Integer id) {
+    User user = userService.getUser(oAuth2User);
+    return noteRepository.findByBook_IdAndBook_User(id,user);
   }
 
-  @PostMapping("/{book_id}")
-  public Note createNote(@AuthenticationPrincipal OAuth2User oAuth2User,@PathVariable Long book_id,@RequestBody NoteRequest note) {
+  @PostMapping("/book_id/{id}")
+  public Note createNote(@AuthenticationPrincipal OAuth2User oAuth2User,@PathVariable Integer id,@RequestBody NoteRequest note) {
     User user = userService.getUser(oAuth2User);
-    Book book = bookRepository.findById(book_id).orElse(null);
-    if (book == null) { return null;}
+    Book book = bookRepository.findById(id).orElse(null);
+    if (book == null) {return null;}
 
     //check if book belongs to user
     if (book.getUser().equals(user)) {
@@ -82,33 +69,19 @@ public class NoteController {
     return null;
   }
 
-  @PutMapping("/{book_id}/{note_id}")
-  public Note updateNote(@AuthenticationPrincipal OAuth2User oAuth2User, @PathVariable Long book_id,@PathVariable Long note_id,@RequestBody NoteRequest note) {
+  @PutMapping("/note_id/{id}")
+  public Note updateNote(@AuthenticationPrincipal OAuth2User oAuth2User, @PathVariable Integer id,@PathVariable Integer note_id,@RequestBody NoteRequest noteRequest) {
    User user = userService.getUser(oAuth2User);
-   Book book = bookRepository.findById(book_id).orElse(null);
-   Note oldNote = noteRepository.findById(note_id).orElse(null);
-   if (book == null || oldNote == null) { return null;}
-
-   if (book.getUser().equals(user) && oldNote.getBook().equals(book)) {
-     oldNote.setBody(note.body);
-     oldNote.setTitle(note.title);
-     return noteRepository.save(oldNote);
-   }
-
-   return null;
+   Note note = noteRepository.findByBook_UserAndId(user,id);
+   if (note == null) {return null;}
+   note.setBody(noteRequest.body);
+   note.setTitle(noteRequest.title);
+   return noteRepository.save(note);
   }
 
-  @DeleteMapping("/{book_id}/{note_id}")
-  public void deleteNote(@AuthenticationPrincipal OAuth2User oAuth2User,@PathVariable Long book_id,@PathVariable Long note_id) {
+  @DeleteMapping("/note_id/{id}")
+  public void deleteNote(@AuthenticationPrincipal OAuth2User oAuth2User,@PathVariable Integer id) {
     User user = userService.getUser(oAuth2User);
-    Book book = bookRepository.findById(book_id).orElse(null);
-    Note note = noteRepository.findById(note_id).orElse(null);
-    if (book == null || note == null) { return;}
-    if (book.getUser().equals(user) && note.getBook().equals(book)) {
-      noteRepository.delete(note);
-    }
+    noteRepository.deleteById(noteRepository.findByBook_UserAndId(user,id).getId());
   }
-
-
-
 }

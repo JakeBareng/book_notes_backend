@@ -1,5 +1,7 @@
 package com.jakebareng.book_notes_app.schemas;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -25,9 +27,11 @@ public class Book {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "user_id", nullable = false)
+  @JsonBackReference
   private User user;
 
   @OneToMany(mappedBy = "book")
+  @JsonManagedReference
   private Set<Note> notes;
 
   public Integer getId() {
